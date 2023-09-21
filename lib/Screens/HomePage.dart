@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'dart:math';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class _HomePageState extends State<HomePage> {
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _pickedImage;
   bool _isLoading = false;
+  String _predictionResult = '';
 
   Future<void> _pickImage() async {
     try {
@@ -25,18 +27,15 @@ class _HomePageState extends State<HomePage> {
         });
 
         // Simulate processing delay (replace with actual ML model prediction)
-        Future.delayed(Duration(seconds: 3), () {
-          // Process the image and get the prediction result
+        await Future.delayed(Duration(seconds: 3));
 
-          // Simulated prediction result
-          String predictionResult = 'Skin disease prediction: 80%';
+        // Simulated prediction result (random number between 0 and 100 as a percentage)
+        int randomPrediction = Random().nextInt(101);
+        String predictionResult = 'Skin disease prediction: $randomPrediction%';
 
-          setState(() {
-            _isLoading = false;
-          });
-
-          // Show the prediction result
-          _showPredictionDialog(predictionResult);
+        setState(() {
+          _predictionResult = predictionResult;
+          _isLoading = false;
         });
       }
     } catch (e) {
@@ -44,24 +43,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _showPredictionDialog(String result) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Prediction Result'),
-          content: Text(result),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
+  void _bookAppointment() {
+    // Implement appointment booking logic here
+    // This is a placeholder, you can replace it with the actual implementation
+    print('Book an appointment with a doctor');
   }
 
   @override
@@ -93,7 +78,10 @@ class _HomePageState extends State<HomePage> {
                     : Container(
                         height: 200,
                         width: 400,
-                        child: Image.file(File(_pickedImage!.path))),
+                        child: Image.file(
+                          File(_pickedImage!.path),
+                        ),
+                      ),
 
                 SizedBox(height: 20),
                 ElevatedButton(
@@ -107,6 +95,27 @@ class _HomePageState extends State<HomePage> {
                 _isLoading
                     ? CircularProgressIndicator() // Display loading indicator
                     : SizedBox(), // Empty space if not loading
+
+                // Display prediction result
+                SizedBox(height: 20),
+                Text(
+                  'Prediction Result:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  _predictionResult,
+                  style: TextStyle(fontSize: 16),
+                ),
+
+                SizedBox(height: 20),
+                // Buttons for actions
+                ElevatedButton.icon(
+                  onPressed:
+                      _predictionResult.isNotEmpty ? _bookAppointment : null,
+                  icon: Icon(FontAwesomeIcons.calendarPlus),
+                  label: Text('Book Appointment'),
+                ),
               ],
             ),
           ),
