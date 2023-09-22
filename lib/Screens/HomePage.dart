@@ -110,18 +110,22 @@ class _HomePageState extends State<HomePage> {
 
                 SizedBox(height: 20),
                 // Buttons for actions
-                ElevatedButton.icon(
-                  onPressed:
-                      _predictionResult.isNotEmpty ? _bookAppointment : null,
-                  icon: Icon(FontAwesomeIcons.calendarPlus),
-                  label: Text('Book Appointment'),
-                ),
               ],
             ),
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(),
+              ),
+            );
+          }
+        },
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
