@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:epidermscan/AppointmentBooking/styles/colors.dart';
 import 'package:epidermscan/AppointmentBooking/styles/styles.dart';
 
-class SliverDoctorDetail extends StatelessWidget {
-  const SliverDoctorDetail({Key? key}) : super(key: key);
+class DoctorDetails extends StatelessWidget {
+  const DoctorDetails({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

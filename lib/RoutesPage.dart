@@ -16,7 +16,7 @@ class _RoutesPageState extends State<RoutesPage> {
   final List<Widget> _pages = [
     // SplashScreen(),
     HomePage(),
-    SliverDoctorDetail(),
+    DoctorDetails(),
     Home(),
     // DoctorProfile(
     //     doctorName: "Kumar Bimal",
