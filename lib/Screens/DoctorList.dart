@@ -1,4 +1,3 @@
-import 'package:epidermscan/Screens/CommonLayout.dart';
 import 'package:flutter/material.dart';
 
 class Doctor {
@@ -20,25 +19,25 @@ class DoctorList extends StatelessWidget {
     Doctor(
       name: 'Dr. John Doe',
       degree: 'MD, Dermatology',
-      imagePath: 'assets/images/doctor1.jpg',
+      imagePath: 'assets/doctorImages/doctor.jpg',
       rating: 4.5,
     ),
     Doctor(
       name: 'Dr. Sarah Smith',
       degree: 'MD, Dermatology',
-      imagePath: 'assets/images/doctor2.jpg',
+      imagePath: 'assets/doctorImages/doctor.jpg',
       rating: 4.8,
     ),
     Doctor(
       name: 'Dr. John Doe',
       degree: 'MD, Dermatology',
-      imagePath: 'assets/images/doctor1.jpg',
+      imagePath: 'assets/doctorImages/doctor.jpg',
       rating: 4.5,
     ),
     Doctor(
       name: 'Dr. Sarah Smith',
       degree: 'MD, Dermatology',
-      imagePath: 'assets/images/doctor2.jpg',
+      imagePath: 'assets/doctorImages/doctor.jpg',
       rating: 4.8,
     ),
     // Add more doctors as needed
@@ -92,10 +91,7 @@ class DoctorList extends StatelessWidget {
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () {
-                // Navigate to the doctor's profile page
-                // You can implement this based on your app's navigation logic
-              },
+              onPressed: () {},
               child: Text('View Profile'),
             ),
           ],
