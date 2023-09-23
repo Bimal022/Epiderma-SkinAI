@@ -42,10 +42,10 @@ class HomeTab extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: ListView(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             UserIntro(),
@@ -56,6 +56,8 @@ class HomeTab extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
+
+            //Av k liye hataya hai bss ye RAKHNA HAI!!!!!!!!
             CategoryIcons(),
             SizedBox(
               height: 20,

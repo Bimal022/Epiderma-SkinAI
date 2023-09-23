@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:epidermscan/AppointmentBooking/styles/colors.dart';
-import 'package:epidermscan/AppointmentBooking/styles/styles.dart';
+import '../styles/colors.dart';
+import '../styles/styles.dart';
+import '../widgets/appointmentcalender.dart';
 
 class DoctorDetails extends StatelessWidget {
-  const DoctorDetails({Key? key}) : super(key: key);
+  final String doctorName;
+  final String specialty;
+  final String imageUrl;
+
+  const DoctorDetails({
+    Key? key,
+    required this.doctorName,
+    required this.specialty,
+    required this.imageUrl,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,28 +22,49 @@ class DoctorDetails extends StatelessWidget {
         slivers: [
           SliverAppBar(
             pinned: true,
-            title: Text('Detail Doctor'),
+            title: const Text('Detail Doctor'),
             backgroundColor: Color(MyColors.primary),
             expandedHeight: 200,
             flexibleSpace: FlexibleSpaceBar(
               background: Image(
-                image: AssetImage('assets/doctorImages/hospital.jpg'),
+                image: AssetImage(imageUrl),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           SliverToBoxAdapter(
-            child: DetailBody(),
-          )
+            child: DetailBody(
+              doctorName: doctorName,
+              specialty: specialty,
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: AppointmentCalendar(
+                onAppointmentSelected: _handleAppointmentSelection),
+          ),
         ],
       ),
     );
   }
 }
 
+void _handleAppointmentSelection(
+    DateTime selectedDate, DateTime _selectedTimeSlot) {
+  // TODO: Implement storing the appointment details
+  // Here, you would store the appointment date, time, and other relevant details
+  // You can use a database or any storage mechanism suitable for your application.
+  print(
+      'Appointment selected: Date: $selectedDate, Time Slot: $_selectedTimeSlot');
+}
+
 class DetailBody extends StatelessWidget {
+  final String doctorName;
+  final String specialty;
+
   const DetailBody({
     Key? key,
+    required this.doctorName,
+    required this.specialty,
   }) : super(key: key);
 
   @override
@@ -44,7 +75,11 @@ class DetailBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          DetailDoctorCard(),
+          DetailDoctorCard(
+            doctorName: doctorName,
+            specialty: specialty,
+            imageUrl: 'assets/doctorImages/hospital.jpg',
+          ),
           SizedBox(
             height: 15,
           ),
@@ -103,7 +138,7 @@ class DoctorLocation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       width: double.infinity,
       height: 200,
       // child: ClipRRect(
@@ -132,8 +167,8 @@ class DoctorInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: const [
+    return const Row(
+      children: [
         NumberCard(
           label: 'Patients',
           value: '100+',
@@ -150,21 +185,6 @@ class DoctorInfo extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class AboutDoctor extends StatelessWidget {
-  final String title;
-  final String desc;
-  const AboutDoctor({
-    Key? key,
-    required this.title,
-    required this.desc,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }
 
@@ -186,7 +206,7 @@ class NumberCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(15),
           color: Color(MyColors.bg03),
         ),
-        padding: EdgeInsets.symmetric(
+        padding: const EdgeInsets.symmetric(
           vertical: 30,
           horizontal: 15,
         ),
@@ -219,8 +239,15 @@ class NumberCard extends StatelessWidget {
 }
 
 class DetailDoctorCard extends StatelessWidget {
+  final String doctorName;
+  final String specialty;
+  final String imageUrl;
+
   const DetailDoctorCard({
     Key? key,
+    required this.doctorName,
+    required this.specialty,
+    required this.imageUrl,
   }) : super(key: key);
 
   @override
@@ -239,7 +266,7 @@ class DetailDoctorCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Kumar Bimal',
+                      doctorName,
                       style: TextStyle(
                           color: Color(MyColors.header01),
                           fontWeight: FontWeight.w700),
@@ -248,7 +275,7 @@ class DetailDoctorCard extends StatelessWidget {
                       height: 10,
                     ),
                     Text(
-                      'Skin Specialist',
+                      specialty,
                       style: TextStyle(
                         color: Color(MyColors.grey02),
                         fontWeight: FontWeight.w500,
@@ -258,7 +285,7 @@ class DetailDoctorCard extends StatelessWidget {
                 ),
               ),
               Image(
-                image: AssetImage('assets/doctorImages/hospital.jpg'),
+                image: AssetImage(imageUrl),
                 width: 100,
               )
             ],

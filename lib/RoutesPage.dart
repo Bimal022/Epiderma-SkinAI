@@ -1,4 +1,5 @@
 import 'package:epidermscan/AppointmentBooking/screens/home.dart';
+import 'package:epidermscan/Screens/UserProfile.dart';
 import 'package:epidermscan/widgets/customNavigationBar.dart';
 import 'package:flutter/material.dart';
 import 'AppointmentBooking/screens/doctor_detail.dart';
@@ -16,13 +17,10 @@ class _RoutesPageState extends State<RoutesPage> {
   final List<Widget> _pages = [
     // SplashScreen(),
     HomePage(),
-    DoctorDetails(),
     Home(),
-    // DoctorProfile(
-    //     doctorName: "Kumar Bimal",
-    //     doctorDegree: "MBBS",
-    //     imagePath: "assets/doctorImages/doctor.jpg",
-    //     rating: 5.0),
+    UserProfilePage(
+        userName: "Bimal022",
+        userProfileImage: "assets/doctorImages/doctor.jpg"),
   ];
 
   @override

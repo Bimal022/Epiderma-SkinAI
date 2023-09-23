@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/doctor_detail.dart';
 import '../styles/colors.dart';
 
 class TopDoctorCard extends StatelessWidget {
@@ -18,7 +19,16 @@ class TopDoctorCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 20),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, '/detail');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DoctorDetails(
+                doctorName: doctorName,
+                specialty: doctorTitle,
+                imageUrl: img,
+              ),
+            ),
+          );
         },
         child: Row(
           children: [
