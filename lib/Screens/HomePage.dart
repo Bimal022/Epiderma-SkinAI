@@ -1,3 +1,4 @@
+import 'package:epidermscan/AppointmentBooking/widgets/userintro.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -53,9 +54,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Epiderma'),
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
