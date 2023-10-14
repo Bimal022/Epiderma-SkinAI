@@ -2,8 +2,6 @@ import 'package:epidermscan/AppointmentBooking/screens/home.dart';
 import 'package:epidermscan/Screens/UserProfile.dart';
 import 'package:epidermscan/widgets/customNavigationBar.dart';
 import 'package:flutter/material.dart';
-import 'AppointmentBooking/screens/doctor_detail.dart';
-import 'Screens/DoctorList.dart';
 import 'Screens/HomePage.dart';
 
 class RoutesPage extends StatefulWidget {
@@ -18,9 +16,7 @@ class _RoutesPageState extends State<RoutesPage> {
     // SplashScreen(),
     HomePage(),
     Home(),
-    UserProfilePage(
-        userName: "Bimal022",
-        userProfileImage: "assets/doctorImages/doctor.jpg"),
+    ProfilePage(),
   ];
 
   @override

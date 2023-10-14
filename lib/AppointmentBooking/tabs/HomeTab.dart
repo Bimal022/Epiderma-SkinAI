@@ -152,7 +152,7 @@ class AppointmentCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Dr. Shahab',
+                            Text('Dr. Prachi Bhati',
                                 style: TextStyle(color: Colors.white)),
                             SizedBox(
                               height: 2,

@@ -1,25 +1,153 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:epidermscan/AppointmentBooking/styles/colors.dart'; // Assuming you have a file for colors
-import 'package:epidermscan/AppointmentBooking/styles/styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:epidermscan/constants/constants.dart';
+import '../loginpage.dart';
 
-import '../loginpage.dart'; // Assuming you have a file for styles
+enum Gender { Male, Female }
 
-class UserProfilePage extends StatelessWidget {
-  final String userName;
-  final String userProfileImage;
+class ProfilePage extends StatefulWidget {
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
 
-  UserProfilePage({
-    Key? key,
-    required this.userName,
-    required this.userProfileImage,
-  }) : super(key: key);
+class _ProfilePageState extends State<ProfilePage> {
+  Gender selectedGender = Gender.Male; // Default to Male
+
+  List<String> profilePictureIcons = List.generate(14, (index) {
+    return 'assets/avatars/users-${index + 1}.png';
+  });
+
+  String selectedProfileIcon = 'assets/avatars/users-1.png';
+  String about = "Hey there! I am using Epiderma-SkinAI.";
+  String name = loggedInUserName; // Default name
+  String username = loggedInUserEmail.replaceAll(
+      RegExp('@gmail.com'), ''); // Default username
+
+  void _showProfilePictureMenu(BuildContext context) async {
+    final icon = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(0, 100, 0, 0),
+      items: profilePictureIcons.map((String icon) {
+        return PopupMenuItem<String>(
+          value: icon,
+          child: Image.asset(icon, width: 100, height: 50),
+        );
+      }).toList(),
+    );
+
+    if (icon != null) {
+      setState(() {
+        selectedProfileIcon = icon;
+        _fetchProfileDataFromFirestore();
+      });
+    }
+  }
+
+  // Firebase Firestore instance
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // Function to push profile data to Firestore
+  Future<void> _pushProfileDataToFirestore() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        // Document path for the user in Firestore
+        final docPath = 'users/${currentUser.uid}';
+
+        // Data to push to Firestore
+        final userData = {
+          'dp': selectedProfileIcon,
+          'name': name,
+          'username': username,
+          'gender': selectedGender == Gender.Male ? 'Male' : 'Female',
+          'about': about,
+        };
+
+        // Update the data in Firestore
+        await _firestore.doc(docPath).set(userData);
+      }
+    } catch (error) {
+      print('Firestore Data Push Error: $error');
+    }
+  }
+
+  // Function to fetch profile data from Firestore
+  Future<void> _fetchProfileDataFromFirestore() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        // Document path for the user in Firestore
+        final docPath = 'users/${currentUser.uid}';
+
+        // Fetch the data from Firestore
+        final docSnapshot = await _firestore.doc(docPath).get();
+
+        // Update the state with the fetched data
+        if (docSnapshot.exists) {
+          final data = docSnapshot.data();
+          setState(() {
+            selectedProfileIcon = data?['dp'];
+            name = data?['name'] ?? name;
+            username = data?['username'] ?? username;
+            selectedGender =
+                data?['gender'] == 'Male' ? Gender.Male : Gender.Female;
+            about = data?['about'] ?? about;
+          });
+        }
+      }
+    } catch (error) {
+      print('Firestore Data Fetch Error: $error');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfileDataFromFirestore();
+  }
+
+  void _showEditDialog(
+      String title, String initialValue, Function(String) onSaved) {
+    TextEditingController textEditingController =
+        TextEditingController(text: initialValue);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: TextFormField(
+            controller: textEditingController,
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog without saving
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                onSaved(textEditingController.text);
+                _pushProfileDataToFirestore();
+                Navigator.pop(context); // Close the dialog after saving
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Function to handle logout
-  Future<void> _handleLogout(BuildContext context) async {
+  Future<void> _handleLogout() async {
     try {
       await _googleSignIn.signOut(); // Sign out from Google
       await _auth.signOut(); // Sign out from Firebase Authentication
@@ -37,127 +165,163 @@ class UserProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'User Profile',
-          style: TextStyle(color: Colors.white),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.blue, Colors.purple],
+          ),
         ),
-        backgroundColor: Color(MyColors.primary),
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              color: Color(MyColors.primary),
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundImage: AssetImage(userProfileImage),
-                    ),
+          children: [
+            GestureDetector(
+              onTap: () {
+                _showProfilePictureMenu(context);
+              },
+              child: Center(
+                child: Hero(
+                  tag: 'profile_picture', // Unique tag for the Hero widget
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.transparent,
+                    backgroundImage: AssetImage(selectedProfileIcon),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            GestureDetector(
+              onTap: () {
+                _showEditDialog('Edit Name', name, (value) {
+                  setState(() {
+                    name = value;
+                  });
+                });
+              },
+              child: Text(
+                name,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                _showEditDialog('Edit Username', username, (value) {
+                  setState(() {
+                    username = value;
+                  });
+                });
+              },
+              child: Text(
+                '@$username', // Display the user's username
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[300],
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            ListTile(
+              leading: FaIcon(FontAwesomeIcons.venusMars),
+              title: Text(
+                'Gender',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Radio<Gender>(
+                    value: Gender.Male,
+                    activeColor: Color(0xFFB917D8),
+                    groupValue: selectedGender,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedGender = value!;
+                      });
+                    },
                   ),
                   Text(
-                    userName,
+                    'Male',
                     style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  Radio<Gender>(
+                    value: Gender.Female,
+                    activeColor: Color(0xFFB917D8),
+                    groupValue: selectedGender,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedGender = value!;
+                      });
+                    },
+                  ),
                   Text(
-                    'New York, USA',
+                    'Female',
                     style: TextStyle(
-                      fontSize: 16,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 20),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'About Me',
-                    style: kTitleStyle,
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus faucibus, sapien quis tincidunt venenatis, orci lectus rhoncus sapien.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(MyColors.grey02),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Interests',
-                    style: kTitleStyle,
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Reading, Traveling, Cooking',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(MyColors.grey02),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Color(MyColors.primary),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    onPressed: () {
-                      // Add functionality for button
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12.0,
-                        horizontal: 20.0,
-                      ),
-                      child: Text(
-                        'Edit Profile',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Color(MyColors.primary),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    onPressed: () =>
-                        _handleLogout(context), // Call logout function
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12.0,
-                        horizontal: 20.0,
-                      ),
-                      child: Text(
-                        'Logout',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+            ListTile(
+              leading: FaIcon(FontAwesomeIcons.circleInfo, color: Colors.white),
+              title: Text(
+                'About',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              subtitle: Text(
+                about,
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              onTap: () {
+                _showEditDialog('Edit About', about, (value) {
+                  setState(() {
+                    about = value;
+                  });
+                });
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.lock, color: Colors.white),
+              title: Text(
+                'Change Password',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              onTap: () {
+                // Handle the change password action
+              },
+            ),
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                _handleLogout();
+              },
+              child: Text('Logout'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFB917D8),
               ),
             ),
           ],
